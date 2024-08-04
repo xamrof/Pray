@@ -34,9 +34,9 @@ public class Lock extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if(imm.isAcceptingText()){
-            System.out.println("Software Keyboard was shown");
+            Log.d("Lock", "Software Keyboard was shown");
         }else{
-            System.out.println("Software Keyboard was not shown");
+            Log.d("Lock", "Software keyboard was not shown");
         }
 
         final TextView text = findViewById(R.id.TextView_Lock_AccessDenied);
@@ -46,10 +46,16 @@ public class Lock extends Activity {
             @Override
             public void onGlobalLayout() {
                 int newHeight = contentView.getHeight();
+                Log.d("show", "previousHeight: "+mPreviousHeight);
                 if(mPreviousHeight != 0){
-                    imageLock.setVisibility(View.GONE);
-                }else if (mPreviousHeight < newHeight){
-                    imageLock.setVisibility(View.VISIBLE);
+                    if(mPreviousHeight > newHeight){
+                        Log.d("Lock", "Software Keyboard was shown");
+                        imageLock.setVisibility(View.GONE);
+                    }
+                    else if (mPreviousHeight < newHeight){
+                        Log.d("Lock", "Software keyboard was not shown");
+                        imageLock.setVisibility(View.VISIBLE);
+                    }
                 }
                 mPreviousHeight = newHeight;
             }
