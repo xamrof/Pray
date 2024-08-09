@@ -24,14 +24,17 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Server listen on port 3000");
-});
-
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.post("/", async (req, res) => {
-  io.emit("messageServer", "hola bb");
+  const { option } = req.body;
+  console.log(`message sended ${option}`);
+  io.emit("messageServer", option);
+  res.status(200);
+});
+
+server.listen(3000, () => {
+  console.log("Server listen on port 3000");
 });

@@ -1,15 +1,25 @@
 // const socket = io();
 
-const text = "sended";
+const sendEvent = async (word) => {
+  try {
+    const response = await fetch("http://127.0.0.1:3000/", {
+      method: "POST",
+      body: JSON.stringify({ word }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-const button = document.getElementById("press");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+  } catch (error) {
+    console.error("sending event", error);
+  }
+};
 
-button.addEventListener("click", async () => {
-  fetch("http://127.0.0.1:3000/", {
-    method: "POST",
-    body: JSON.stringify({ text }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-});
+const app_button = document.getElementById("app_button");
+const service_button = document.getElementById("service_button");
+
+app_button.addEventListener("click", () => sendEvent("app"));
+service_button.addEventListener("click", () => sendEvent("service"));
