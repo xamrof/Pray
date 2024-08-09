@@ -1,5 +1,8 @@
 package com.example.pray;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +21,8 @@ import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity {
     private Socket socket;
+    private DevicePolicyManager devicePolicyManager;
+    private ComponentName componentName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +35,25 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        componentName = new ComponentName(this, MyAdmin.class);
+
+       if(!devicePolicyManager.isAdminActive(componentName)){
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "You need to activate Device admin");
+            startActivity(intent);
+        }
+
+       /* Intent serviceIntent = new Intent(this, PrayLockService.class);
+        startService(serviceIntent);*/
+
         try{
             IO.Options options = new IO.Options();
             options.transports = new String[]{"websocket"};
 
-            socket = IO.socket("http://10.0.2.2:3000/", options);
+            //For execute in an android device use ipConfig the ipv4 address
+            socket = IO.socket("http://10.0.2.2:3000", options);
 
 
             socket.on(Socket.EVENT_CONNECT, onConnect);
@@ -43,13 +62,11 @@ public class MainActivity extends AppCompatActivity {
             socket.on("connect_error", args -> {
                 Object error = args[0];
                 Log.d("SocketIO", "Connection error: "+error.toString());
-
-
             });
             socket.on("messageServer", onMessage);
 
         }catch(URISyntaxException e){
-            System.out.println("Error: "+e.getMessage());
+            Log.d("SocketIO-URI", "Error: "+e.getMessage());
         }
 
         socket.connect();

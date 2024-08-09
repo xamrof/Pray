@@ -1,2 +1,5 @@
-package com.example.pray;public class PrayPermission {
+package com.example.pray;
+
+public class PrayPermission {
+
 }
